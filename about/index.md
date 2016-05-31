@@ -18,4 +18,4 @@ Press the buttom BELLOW! Enjoy!
 * 重点在这里：茶客声是技术宅，这里会有一些dev-ops的总结，一些python/flask，以及一些工具用法。
 * ps.顺带post一些我平时收集的小u谱，嘿嘿...！奥，你可以点下面：
 
-<div markdown="0"><a href="{{ site.url }}/theme-setup/" class="btn btn-info">Dev-Ops</a> <a href="https://github.com/mmistakes/hpstr-jekyll-theme" class="btn btn-success">Ukulele</a></div>
+<div markdown="0"><a href="{{ site.url }}/posts/" class="btn btn-info">Dev-Ops</a> <a href="" class="btn btn-success">Ukulele</a></div>
