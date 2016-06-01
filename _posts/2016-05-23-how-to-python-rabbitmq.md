@@ -138,6 +138,10 @@ channel.start_consuming()
  [x] Received 'Hello World!'
 {% endhighlight %}
 
+# 一些要点
+1. 消息发送到exchange中，而不是直接发送到队列中。这个exchange暂时被默认设置为空，它其实可以用于发布和订阅的功能，下篇文章再介绍。
+2. channel.queue_declare(queue='hello')这句将hello这个队列在发送程序和接收程序各自声明了一次，这是由于我们不能保证哪一个程序会被先执行。当然如果能保证其中一个先执行，另一个可以不用再声明。
+
 
 
 
