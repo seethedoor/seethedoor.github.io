@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 用rabbitMQ做python的amqp连接
-description: "怎样用rabbitMQ来做python的amqp协议的分布式rpc连接，本文介绍它的一些简单原理，并介绍简单的实现代码"
+title: 用rabbitMQ做基于python的消息发送和接收
+description: "怎样用rabbitMQ做消息的发送和接收，本文介绍它的一些简单原理，并介绍简单的实现代码"
 modified: 2016-5-26
-tags: [python, amqp]
+tags: [python, rabbitMQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
@@ -22,7 +22,11 @@ image:
 
 Post Office当然是一个第三方的服务。于是不管是服务端还是客户端，是收信件的还是发信件的，大家都要跟这个Post Office连接上。post office会根据发信人的地址，把信送到收信人的手里。这个过程，包括了信息收发、信息存储、信息路由。靠谱的post office会把所有信件存在保险箱里，就算房子倒了，保险箱里的信件还在。rabbitMQ就是这种，它会把信息做持久化，不是只存在内存中，重启主机还能找回数据。有的MQ没有持久化，比如ActiveMQ。
 
-下面是代码，怎么用python来写AMQP的信息收发。我们用pika 0.10.0，这是一个AMQP协议的python客户端包。
+怎么用python来写AMQP的信息收发，下面写几篇文章总结一下如何从发送接收消息到使用rabbitMQ做RPC。
+
+本篇的后续内容，介绍如何实现消息在rabbitMQ上的发送接收。
+我们用pika 0.10.0，这是一个对接rabbitMQ的python客户端包。
+
 
 # 用python怎么写信息的发送端？
 首先的首先，需要下载一个pika，地址https://pypi.python.org/pypi?:action=show_md5&digest=db5025bc5abfb0f78573616ee846df31
