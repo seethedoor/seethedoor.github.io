@@ -81,11 +81,38 @@ channel.basic_consume(callback,
 print(' [*] Waiting for messages. To exit press CTRL+C')
 channel.start_consuming()
 {% endhighlight %}
-no_ack什么意思，下回分解。
+
 最后创建一个持续监听的进程，等待消息的到来。
 
+## 消息确认机制
+上面有个参数no_ack什么意思，解释一下。
+消息被接收走之后，如果设置为no_ack，那此时rabbitMQ就会把队列里面这条消息干掉。如果此时任务执行失败，比如某个收了消息的worker挂了，那这个消息就从此消失了。因此，rabbitMQ考虑了这个情况，加了一个消息确认的机制，如果这里no_ack设置为False（或者不用设，默认ack开启），那么在消息被worker执行完返回的时候，会向队列发送一个ACK说明某个消息已经被接收和处理完了。MQ接收到这个ACK确认之后，才会将消息删除。一个场景：worker执行的时候宕机了，就会将消息发送给另一个worker，而不是直接删除。如此来保证消息被接收不丢失。
+这里有个问题，rabbitMQ什么时候会认为worker挂掉而重发消息呢？判断标准是worker是否还在监听队列，如果它没有发送ACK就断开连接了，此时就认为消息该重发了。rabbitMQ没有超时的概念。
+这个在接收端返回的ack如何发送呢？
+{% highlight css %}
+ch.basic_ack(delivery_tag = method.delivery_tag)
+{% endhighlight %}
+这句话加在callback函数的最后。如果忘了在接收端加这句重要的ACK而没设置no_ack=True的话，后果就会是，rabbitMQ一直以为你没有执行完成，于是一直hold住这个消息，这样消息体就会越塞越多，最后把内存撑爆。
+这句话，用在下一篇文章里吧！
+
+## 消息持久化
+消息如果只存内存，那rabbitMQ主机倒了，上面的消息就全部丢失。消息的持久化可以避免这个问题。
+首先，要在声明队列的时候加durable参数。这样可以使声明的‘hello’队列做持久化。
+{% highlight css %}
+channel.queue_declare(queue='hello', durable=True)
+{% endhighlight %}
+然后，在发送消息的时候，将消息的delivery_mode设为2，则该消息体也做了持久化。
+{% highlight css %}
+channel.basic_publish(exchange='',
+                      routing_key="task_queue",
+                      body=message,
+                      properties=pika.BasicProperties(
+                         delivery_mode = 2, # make message persistent
+                      )) 
+{% endhighlight %}
+
 # 汇总
-这两段代码张这样：
+上面这两个特性先别用上，那这两段代码长这样：
 
 ## send.py
 {% highlight css %}
