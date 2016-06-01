@@ -3,7 +3,7 @@ layout: post
 title: 用rabbitMQ做python的amqp连接
 description: "怎样用rabbitMQ来做python的amqp协议的分布式rpc连接，本文介绍它的一些简单原理，并介绍简单的实现代码"
 modified: 2016-5-26
-tags: [python]
+tags: [python, amqp]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
@@ -25,7 +25,12 @@ Post Office当然是一个第三方的服务。于是不管是服务端还是客
 下面是代码，怎么用python来写AMQP的信息收发。我们用pika 0.10.0，这是一个AMQP协议的python客户端包。
 
 # 用python怎么写信息的发送端？
-
+首先的首先，需要下载一个pika，地址https://pypi.python.org/pypi?:action=show_md5&digest=db5025bc5abfb0f78573616ee846df31
+拿到之后，解压，安装，安装方法如下：
+{% highlight css %}
+# python setup.py build
+# python setup.py install
+{% endhighlight %}
 首先创建一个连接，假设MQ在本地。
 
 {% highlight css %}
@@ -38,7 +43,7 @@ channel = connection.channel()
 {% endhighlight %}
 
 于是我们连接上了MQ。
-我要提问：MQ有用户名密码，在哪里输入？
+（如果MQ有用户名密码，在哪里输入？这是个问题，下一篇文章解答）
 
 连上之后，需要一个有一条队列，我们再往这个队列中扔信息。假设这个队列叫“hello”
 
@@ -47,6 +52,91 @@ channel.queue_declare(queue='hello')
 {% endhighlight %}
 
 往队列里面发一条字符串“hello world!”
+
+这个时候，通过命令rabbitmqctl list_queues可以看到你所发的这条消息数。如果你发送了消息另一端还没收走，应该有这种效果，hello队列里面有1条消息：
+{% highlight css %}
+$ rabbitmqctl list_queues
+Listing queues ...
+hello    1
+...done.
+{% endhighlight %}
+
+# 用python怎么写信息的接收端？
+同样，需要装好pika。
+then, 需要在代码里创建一个callback函数，这个函数将被pika调用。
+{% highlight css %}
+def callback(ch, method, properties, body):
+    print(" [x] Received %r" % body)
+{% endhighlight %}
+
+然后，这个函数的接收对象队列需要说明清楚，是“hello”：
+{% highlight css %}
+channel.basic_consume(callback,
+                      queue='hello',
+                      no_ack=True)
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+{% endhighlight %}
+no_ack什么意思，下回分解。
+最后创建一个持续监听的进程，等待消息的到来。
+
+# 汇总
+这两段代码张这样：
+
+## send.py
+{% highlight css %}
+#!/usr/bin/env python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+channel.basic_publish(exchange='',
+                      routing_key='hello',
+                      body='Hello World!')
+print(" [x] Sent 'Hello World!'")
+connection.close()
+{% endhighlight %}
+
+## receive.py
+{% highlight css %}
+#!/usr/bin/env python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+def callback(ch, method, properties, body):
+    print(" [x] Received %r" % body)
+
+channel.basic_consume(callback,
+                      queue='hello',
+                      no_ack=True)
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+{% endhighlight %}
+
+# 执行结果
+
+## 发送端
+{% highlight css %}
+ # python sendamqp.py 
+ [x] Sent 'Hello World!'
+{% endhighlight %}
+
+## 接收端
+{% highlight css %}
+  # python recamqp.py 
+ [*] Waiting for messages. To exit press CTRL+C
+ [x] Received 'Hello World!'
+{% endhighlight %}
 
 
 
