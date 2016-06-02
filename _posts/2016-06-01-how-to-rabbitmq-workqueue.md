@@ -65,4 +65,54 @@ worker3
  [x] Done
 {% endhighlight %}
 
-上面的结果，显然是顺序接收，使用了轮询的消息处理（round-robin）。我不了解是否有其他的消息负载均衡机制，后面如果有机会再研究。
+上面的结果，显然是顺序接收，使用了轮询的消息处理（round-robin）。这种方式有一个问题，只是一味地进行平均分发，如果任务的长短并不相同，那负载均衡效果就比较差。
+rabbitMQ有一个basic_qos方法，将prefecth_count设置为1，表示在worker处理完手头的1个任务之前，不给他发送其他消息。这样，可以让MQ优先发给那些先处理完手头任务的接收者。
+{% highlight css %}
+channel.basic_qos(prefecth_count=1)
+{% endhighlight %}
+
+不过这种办法要考虑队列本身能承受的消息量。如果消息量比较大，还是尽快将消息分发下去为好，免得把rabbitMQ撑爆，性能下降。
+
+# 代码汇总
+## task.py
+{% highlight css %}
+#!/usr/bin/env python
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+channel.basic_publish(exchange='',
+                      routing_key='hello',
+                      body='Hello World!')
+print(" [x] Sent 'Hello World!'")
+connection.close()
+{% endhighlight %}
+
+## worker.py
+{% highlight css %}
+#!/usr/bin/env python
+import pika,time
+
+connection = pika.BlockingConnection(pika.ConnectionParameters(
+        host='localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='task_queue', durable=True)
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+
+def callback(ch, method, properties, body):
+    print " [x] Received %r" % (body,)
+    time.sleep( body.count('.') )
+    print " [x] Done"
+    ch.basic_ack(delivery_tag = method.delivery_tag)
+
+channel.basic_consume(callback,
+                      queue='task_queue')
+
+channel.start_consuming()
+{% endhighlight %}
