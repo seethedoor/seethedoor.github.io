@@ -3,7 +3,7 @@ layout: post
 title: 如何使用python创建xml-RPC服务
 description: "怎样使用python的自有模块完成xml-rpc服务端和客户端，并提供了实例代码"
 modified: 2016-5-24
-tags: [python]
+tags: [python, rpc]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz

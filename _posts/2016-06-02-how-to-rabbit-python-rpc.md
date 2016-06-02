@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 使用rabbitMQ实现python服务的rpc连接
+title: (4)使用rabbitMQ实现python服务的rpc连接
 description: "使用rabbitMQ实现python服务的rpc连接"
 modified: 2016-6-2
 tags: [python, rabbitMQ, rpc]
