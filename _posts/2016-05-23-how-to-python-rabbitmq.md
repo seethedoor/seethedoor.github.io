@@ -24,20 +24,25 @@ Post Office当然是一个第三方的服务。于是不管是服务端还是客
 
 怎么用python来写AMQP的信息收发，下面写几篇文章总结一下如何从发送接收消息到使用rabbitMQ做RPC。
 
-本篇的后续内容，介绍如何实现消息在rabbitMQ上的发送接收。
+ok，前面都是废话，本篇的后续内容，介绍如何实现消息在rabbitMQ上的发送接收。类似下面的这种最简单的情况。当然，准备在后面的两三篇文章讲到用rabbit来做python的rpc连接。
+<figure class="half">
+  <img src="/images/rabbit_trans.png" alt="">
+  <figcaption>发送接收消息原理.</figcaption>
+</figure>
+
 我们用pika 0.10.0，这是一个对接rabbitMQ的python客户端包。
 
 
 # 用python怎么写信息的发送端？
 首先的首先，需要下载一个pika，地址https://pypi.python.org/pypi?:action=show_md5&digest=db5025bc5abfb0f78573616ee846df31
 拿到之后，解压，安装，安装方法如下：
-{% highlight css %}
+{% highlight bash %}
 # python setup.py build
 # python setup.py install
 {% endhighlight %}
 首先创建一个连接，假设MQ在本地。
 
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 
@@ -51,14 +56,14 @@ channel = connection.channel()
 
 连上之后，需要一个有一条队列，我们再往这个队列中扔信息。假设这个队列叫“hello”
 
-{% highlight css %}
+{% highlight python %}
 channel.queue_declare(queue='hello')
 {% endhighlight %}
 
 往队列里面发一条字符串“hello world!”
 
 这个时候，通过命令rabbitmqctl list_queues可以看到你所发的这条消息数。如果你发送了消息另一端还没收走，应该有这种效果，hello队列里面有1条消息：
-{% highlight css %}
+{% highlight python %}
 $ rabbitmqctl list_queues
 Listing queues ...
 hello    1
@@ -68,13 +73,13 @@ hello    1
 # 用python怎么写信息的接收端？
 同样，需要装好pika。
 then, 需要在代码里创建一个callback函数，这个函数将被pika调用。
-{% highlight css %}
+{% highlight python %}
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
 {% endhighlight %}
 
 然后，这个函数的接收对象队列需要说明清楚，是“hello”：
-{% highlight css %}
+{% highlight python %}
 channel.basic_consume(callback,
                       queue='hello',
                       no_ack=True)
@@ -89,7 +94,7 @@ channel.start_consuming()
 消息被接收走之后，如果设置为no_ack，那此时rabbitMQ就会把队列里面这条消息干掉。如果此时任务执行失败，比如某个收了消息的worker挂了，那这个消息就从此消失了。因此，rabbitMQ考虑了这个情况，加了一个消息确认的机制，如果这里no_ack设置为False（或者不用设，默认ack开启），那么在消息被worker执行完返回的时候，会向队列发送一个ACK说明某个消息已经被接收和处理完了。MQ接收到这个ACK确认之后，才会将消息删除。一个场景：worker执行的时候宕机了，就会将消息发送给另一个worker，而不是直接删除。如此来保证消息被接收不丢失。
 这里有个问题，rabbitMQ什么时候会认为worker挂掉而重发消息呢？判断标准是worker是否还在监听队列，如果它没有发送ACK就断开连接了，此时就认为消息该重发了。rabbitMQ没有超时的概念。
 这个在接收端返回的ack如何发送呢？
-{% highlight css %}
+{% highlight python %}
 ch.basic_ack(delivery_tag = method.delivery_tag)
 {% endhighlight %}
 这句话加在callback函数的最后。如果忘了在接收端加这句重要的ACK而没设置no_ack=True的话，后果就会是，rabbitMQ一直以为你没有执行完成，于是一直hold住这个消息，这样消息体就会越塞越多，最后把内存撑爆。
@@ -98,11 +103,11 @@ ch.basic_ack(delivery_tag = method.delivery_tag)
 ## 消息持久化
 消息如果只存内存，那rabbitMQ主机倒了，上面的消息就全部丢失。消息的持久化可以避免这个问题。
 首先，要在声明队列的时候加durable参数。这样可以使声明的‘hello’队列做持久化。
-{% highlight css %}
+{% highlight python %}
 channel.queue_declare(queue='hello', durable=True)
 {% endhighlight %}
 然后，在发送消息的时候，将消息的delivery_mode设为2，则该消息体也做了持久化。
-{% highlight css %}
+{% highlight python %}
 channel.basic_publish(exchange='',
                       routing_key="task_queue",
                       body=message,
@@ -115,7 +120,7 @@ channel.basic_publish(exchange='',
 上面这两个特性先别用上，那这两段代码长这样：
 
 ## send.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 
@@ -133,7 +138,7 @@ connection.close()
 {% endhighlight %}
 
 ## receive.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 
@@ -157,13 +162,13 @@ channel.start_consuming()
 # 执行结果
 
 ## 发送端
-{% highlight css %}
+{% highlight python %}
  # python sendamqp.py 
  [x] Sent 'Hello World!'
 {% endhighlight %}
 
 ## 接收端
-{% highlight css %}
+{% highlight python %}
   # python recamqp.py 
  [*] Waiting for messages. To exit press CTRL+C
  [x] Received 'Hello World!'

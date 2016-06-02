@@ -24,7 +24,7 @@ Remote Procedure Call， 远程过程调用， 一种常用的分布式系统接
 
 这里做了个最简单的例子，实现了加减乘除四个方法。server端脚本如下:
 
-{% highlight css %}
+{% highlight python %}
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 from SimpleXMLRPCServer import SimpleXMLRPCServer
@@ -53,7 +53,7 @@ server.serve_forever()
 
 client端则远程调用这四个函数并且打印结果，脚本如下：
 
-{% highlight css %}
+{% highlight python %}
 # -*- coding:utf-8 -*-
 # !/usr/bin/env python
 

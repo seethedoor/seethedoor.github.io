@@ -2,7 +2,7 @@
 layout: post
 title: 使用rabbitMQ的消息交换机
 description: "rabbitMQ的消息交换机制"
-modified: 2016-6-1
+modified: 2016-6-2
 tags: [python, rabbitMQ]
 image:
   feature: abstract-3.jpg
@@ -31,8 +31,13 @@ image:
 
 # 扇形交换机示例
 
+<figure class="half">
+  <img src="/images/rabbit_fanout.png" alt="">
+  <figcaption>扇形交换机原理.</figcaption>
+</figure>
+
 ## emi_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 import sys
@@ -56,7 +61,7 @@ connection.close()
 {% endhighlight %}
 
 ## receiv_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 
@@ -91,9 +96,13 @@ channel.start_consuming()
 {% endhighlight %}
 
 # 直连交换机示例
+<figure class="half">
+  <img src="/images/rabbit_direct.png" alt="">
+  <figcaption>直连交换机原理.</figcaption>
+</figure>
 
 ## emi_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 import sys
@@ -119,7 +128,7 @@ connection.close()
 {% endhighlight %}
 
 ## receiv_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 import sys
@@ -162,9 +171,13 @@ channel.start_consuming()
 {% endhighlight %}
 
 # 主题交换机示例
+<figure class="half">
+  <img src="/images/rabbit_topic.png" alt="">
+  <figcaption>主题交换机原理.</figcaption>
+</figure>
 
 ## emi_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 import sys
@@ -189,7 +202,7 @@ connection.close()
 {% endhighlight %}
 
 ## receiv_logs.py
-{% highlight css %}
+{% highlight python %}
 #!/usr/bin/env python
 import pika
 import sys
