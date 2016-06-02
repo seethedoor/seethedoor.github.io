@@ -1,9 +1,9 @@
 ---
 layout: post
-title: 用rabbitMQ做工作队列
+title: 用rabbitMQ做工作队列的接收端负载均衡
 description: "怎样用rabbitMQ来做python的工作队列，用于解决一些时延性的方法调度问题"
 modified: 2016-6-1
-tags: [python, rabbitMQ, workqueue]
+tags: [python, rabbitMQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
@@ -74,6 +74,7 @@ channel.basic_qos(prefecth_count=1)
 不过这种办法要考虑队列本身能承受的消息量。如果消息量比较大，还是尽快将消息分发下去为好，免得把rabbitMQ撑爆，性能下降。
 
 # 代码汇总
+
 ## task.py
 {% highlight css %}
 #!/usr/bin/env python
