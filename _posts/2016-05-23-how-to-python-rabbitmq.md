@@ -52,7 +52,18 @@ channel = connection.channel()
 {% endhighlight %}
 
 于是我们连接上了MQ。
-（如果MQ有用户名密码，在哪里输入？这是个问题，下一篇文章解答）
+如果是远程访问的，需要用户名密码，如何认证呢？pika有个credentials的类，可以装载这些内容。
+{% highlight python %}
+import pika
+
+# Set the connection parameters to connect to rabbit-server1 on port 5672
+# on the / virtual host using the username "guest" and password "guest"
+credentials = pika.PlainCredentials('guest', 'guest')
+parameters = pika.ConnectionParameters('rabbit-server1',
+                                       5672,
+                                       '/',
+                                       credentials)
+{% endhighlight %}
 
 连上之后，需要一个有一条队列，我们再往这个队列中扔信息。假设这个队列叫“hello”
 
