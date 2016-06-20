@@ -31,7 +31,7 @@ Host aws_ec2
 
 # 然后在远程主机安装shadowsocks服务
 
-1、安装组件，运行以下指令：
+1.安装组件，运行以下指令：
 {% highlight shell %}
 yum install m2crypto python-setuptools
 easy_install pip
@@ -39,7 +39,7 @@ pip install shadowsocks
 {% endhighlight %}
 安装时部分组件需要输入Y确认。
 
-2、安装完成后配置服务器参数，运行以下指令：
+2.安装完成后配置服务器参数，运行以下指令：
 {% highlight shell %}
 vi  /etc/shadowsocks.json
 {% endhighlight %}
@@ -61,7 +61,7 @@ vi  /etc/shadowsocks.json
 
 将上面的mypassword替换成你的密码，server_port也是可以修改的，例如3024，传说端口越小，效果越好，这个我没有去验证，但建议不要小于1024，以免引起不必要的麻烦。
 
-3、运行下面的命令，启动shadowsocks
+3.运行下面的命令，启动shadowsocks
 
 {% highlight shell %}
 ssserver -c /etc/shadowsocks.json
