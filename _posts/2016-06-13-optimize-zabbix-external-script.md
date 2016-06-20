@@ -82,3 +82,5 @@ image:
                 njInfo['content']['consumerNum'][rpcItem] = matchObj.group(1)
         # search results is in matchObj.group, take it out.
 {% endhighlight %}
+
+当然这段代码返回的是一堆queue的comsumer数，zabbix的监控往往只要一个，那么需要再做一层匹配啦！
