@@ -9,7 +9,6 @@ image:
   credit: dargadgetz
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 ---
-
 这个十分实用，废话不多说了：就是教你在国外亚马逊搭一套shadowsocks，然后本地用chrome和插件“switchsharp”科学上网。
 （以下内容从几篇文章里面转载整合）
 
