@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 2016-06-28-restful-design
+title: 用restful来设计API
 description: 
 modified: 2016-6-28
 tags: [restful]
