@@ -78,7 +78,7 @@ Ps.有个小问题。使用itsdangerous包的TimedJSONWebSignatureSerializer进�
 #### 1.3.3 signature
 存储了序列化的secreate key和salt key。这个部分需要base64加密后的header和base64加密后的payload使用.连接组成的字符串，然后通过header中声明的加密方式进行加盐secret组合加密，然后就构成了jwt的第三部分。
 
-## 我的认证需求
+##2. 我的认证需求
 
 考虑到我的系统是一个前后端分离的后台程序，用于运维工作，虽在内网使用，也有一定的保密性要求。
 
@@ -90,7 +90,7 @@ Ps.有个小问题。使用itsdangerous包的TimedJSONWebSignatureSerializer进�
 
 选择JWT。
 
-## 2. JWT实现
+## 3. JWT实现
 
 ### 2.1 如何生成token
 这里使用python模块itsdangerous，这个模块能做很多编码工作，其中一个是实现JWS的token序列。
@@ -137,7 +137,7 @@ eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ2NzM0MTQ3NCwiaWF0IjoxNDY3MzM3ODc0fQ.eyJpYXQiOjE0N
 {% endhighlight %}
 它是由“header.payload.signature”构成的。
 
-### 2.2 如何解析token
+### 3.2 如何解析token
 
 解析需要使用到同样的serializer，配置一样的secret key和salt，使用loads方法来解析token。itsdangerous提供了各种异常处理类，用起来也很方便：
 如果是SignatureExpired，则可以直接返回过期；
@@ -186,7 +186,7 @@ from itsdangerous import SignatureExpired, BadSignature, BadData
         return [userId, roleId, msg]
 {% endhighlight %}
 
-## 3. 优化
+## 4. 优化
 上述的方法可以做到基本的JWT认证，但在实际开发过程中还有其他问题，于是各种借鉴，优化了一些东西。
 
 token在生成之后，是靠expire使其过期失效的。签发之后的token，是无法收回修改的，因此涉及token的有效期的更改是个难题，它体现在以下两个问题：
@@ -209,7 +209,7 @@ refresh token不可再延期，过期需重新使用用户名密码登录。
 
 ps.前面提到创建token的时候将expire_in超时时间间隔作为函数的形参，是为了将此函数用于生成access token和refresh token，而两者的expire_in时间是不同的。
 
-## 4. 总结一下
+## 5. 总结一下
 
 我们做了一个JWT的认证模块:
 (access token在代码中为'token'，refresh token在代码中为'rftoken')
