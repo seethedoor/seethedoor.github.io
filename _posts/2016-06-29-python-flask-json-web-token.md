@@ -10,7 +10,7 @@ image:
   creditlink: http://www.dargadgetz.com/ios-7-abstract-wallpaper-pack-for-iphone-5-and-ipod-touch-retina/
 ---
 
-最近给一个运维系统的后端搭建代码框架，其中一个问题是写一个认证和授权的模块。关于认证的问题，已经解决了快半年，然而一直没有时间总结一下这块内容。今天的文章介绍一种适用于restful+json的API认证方法，这个方法是基于jwt，并且加入了一些从oauth2.0借鉴的改良。
+前段时间给一个运维系统的后端搭建代码框架，今天的文章介绍一种适用于restful+json的API认证方法，这个方法是基于jwt，并且加入了一些从oauth2.0借鉴的改良。
 
 ## 1. 常见的几种实现认证的方法
 
