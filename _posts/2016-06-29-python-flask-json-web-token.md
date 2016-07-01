@@ -191,9 +191,9 @@ from itsdangerous import SignatureExpired, BadSignature, BadData
 
 token在生成之后，是靠expire使其过期失效的。签发之后的token，是无法收回修改的，因此涉及token的有效期的更改是个难题，它体现在以下两个问题：
 
-*问题1.用户登出
+* 问题1.用户登出
 
-*问题2.token自动延期
+* 问题2.token自动延期
 
 解决有效期问题，很自然能想到的是把每个token存库，设置一个valid字段，一旦注销了就valid=0；设置有效期字段，想要延期就增加有效期时间。openstack keystone就是这么做的。这个做法虽方便，但对数据库的压力较大，甚至在访问量较大，签发token较多的情况下，是对数据库的一个挑战。
 
