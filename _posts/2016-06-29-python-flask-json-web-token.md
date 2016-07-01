@@ -12,11 +12,11 @@ image:
 
 最近给一个运维系统的后端搭建代码框架，其中一个问题是写一个认证和授权的模块。关于认证的问题，已经解决了快半年，然而一直没有时间总结一下这块内容。今天的文章介绍一种适用于restful+json的API认证方法，这个方法是基于jwt，并且加入了一些从oauth2.0借鉴的改良。
 
-## 常见的几种实现认证的方法
+## 1. 常见的几种实现认证的方法
 
 首先要明白，认证和鉴权是不同的。认证是判定用户的合法性，鉴权是判定用户的权限级别是否可执行后续操作。这里所讲的仅含认证。认证有几种方法：
 
-### basic auth
+### 1.1 basic auth
 
 这是http协议中所带带基本认证，是一种简单为上的认证方式。原理是在每个请求的header中添加用户名和密码的字符串（格式为“username:password”，用base64编码）。
 
@@ -30,20 +30,20 @@ image:
 
 总体来说，这种方法的特点就是，简单但不安全。
 
-### cookie
+### 1.2cookie
 
 将认证的结果存在客户端的cookie中，通过检查cookie中的身份信息来作为认证结果。
 这种方式的特点是便捷，且只需要一次认证，多次可用；也可以注销登录状态和设置过期时间；甚至也有办法（比如设置httpOnly）来避免XSS攻击。
 
 但它的缺点十分明显，使用cookie那便是有状态的服务了。
 
-### token
+### 1.3 token
 
 JWT协议似乎已经应用十分广泛，JSON Web Token——一种基于token的json格式web认证方法。基本的原理是，第一次认证通过用户名密码，服务端签发一个json格式的token。后续客户端的请求都携带这个token，服务端仅需要解析这个token，来判别客户端的身份和合法性。
 
 而JWT协议仅仅规定了这个协议的格式（<a href="https://tools.ietf.org/heml/rfc7519">RFC7519</a>），它的序列生成方法在JWS协议中描述（https://tools.ietf.org/html/rfc7515），分为三个部分：
 
-#### 1. header头部：
+#### 1.3.1 header头部：
 
 * 声明类型，这里是jwt
 
@@ -58,7 +58,7 @@ JWT协议似乎已经应用十分广泛，JSON Web Token——一种基于token�
 {% endhighlight %}
 再将其进行base64编码。
 
-#### 2. payload载荷：
+#### 1.3.2 payload载荷：
 payload是放置实际有效使用信息的地方。JWT定义了几种内容，包括：
 
 * 标准中注册的声明，如签发者，接收者，有效时间（exp），时间戳（iat,issued at）等；为官方建议但非必须
@@ -75,7 +75,7 @@ payload是放置实际有效使用信息的地方。JWT定义了几种内容，�
 
 Ps.有个小问题。使用itsdangerous包的TimedJSONWebSignatureSerializer进行token序列生成的结果，exp是在头部里的。这里似乎违背了jwt的协议规则。
 
-#### 3. signature
+#### 1.3.3 signature
 存储了序列化的secreate key和salt key。这个部分需要base64加密后的header和base64加密后的payload使用.连接组成的字符串，然后通过header中声明的加密方式进行加盐secret组合加密，然后就构成了jwt的第三部分。
 
 ## 我的认证需求
@@ -90,9 +90,9 @@ Ps.有个小问题。使用itsdangerous包的TimedJSONWebSignatureSerializer进�
 
 选择JWT。
 
-## JWT实现
+## 2. JWT实现
 
-### 1. 如何生成token
+### 2.1 如何生成token
 这里使用python模块itsdangerous，这个模块能做很多编码工作，其中一个是实现JWS的token序列。
 genTokenSeq这个函数用于生成token。其中使用的是TimedJSONWebSignatureSerializer进行序列的生成，这里secret_key、salt从配置文件中读取，当然也可以直接写死在这里。expires_in是超时时间间隔，这个间隔以秒记，可以直接在这里设置，我选择将其设为方法的形参（因为这个函数也用在了解决问题2）。
 
@@ -137,7 +137,7 @@ eyJhbGciOiJIUzI1NiIsImV4cCI6MTQ2NzM0MTQ3NCwiaWF0IjoxNDY3MzM3ODc0fQ.eyJpYXQiOjE0N
 {% endhighlight %}
 它是由“header.payload.signature”构成的。
 
-### 2. 如何解析token
+### 2.2 如何解析token
 
 解析需要使用到同样的serializer，配置一样的secret key和salt，使用loads方法来解析token。itsdangerous提供了各种异常处理类，用起来也很方便：
 如果是SignatureExpired，则可以直接返回过期；
@@ -186,7 +186,7 @@ from itsdangerous import SignatureExpired, BadSignature, BadData
         return [userId, roleId, msg]
 {% endhighlight %}
 
-## 优化
+## 3. 优化
 上述的方法可以做到基本的JWT认证，但在实际开发过程中还有其他问题，于是各种借鉴，优化了一些东西。
 
 token在生成之后，是靠expire使其过期失效的。签发之后的token，是无法收回修改的，因此涉及token的有效期的更改是个难题，它体现在以下两个问题：
@@ -209,9 +209,10 @@ refresh token不可再延期，过期需重新使用用户名密码登录。
 
 ps.前面提到创建token的时候将expire_in超时时间间隔作为函数的形参，是为了将此函数用于生成access token和refresh token，而两者的expire_in时间是不同的。
 
-## 总结一下
+## 4. 总结一下
 
-我们做了一个JWT的认证模块(access token在代码中为'token'，refresh token在代码中为'rftoken')：
+我们做了一个JWT的认证模块:
+(access token在代码中为'token'，refresh token在代码中为'rftoken')
 
 * 首次认证
 
@@ -242,6 +243,7 @@ client <-----新token--------------  server
 client -请求新token（携带rftoken）->  server
 
 client <----msg:rftoken expired---  server
+
 
 如果设计一个针对此认证的前端，需要：
 
