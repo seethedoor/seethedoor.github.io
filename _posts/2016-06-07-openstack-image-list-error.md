@@ -11,7 +11,7 @@ image:
 ---
 
 # 问题描述
-* 安装openstack kilo版的时候有一个十分诡异的现象，在使用glance client执行glance image-list时十分正常，而在使用nova client执行nova image-list时却返回一个500：
+* 最近openstack（kilo）除了一个十分诡异的现象，在使用glance client执行glance image-list时十分正常，而在使用nova client执行nova image-list时却返回一个500：
 
 {%highlight shell%}
 # nova image-list                                
