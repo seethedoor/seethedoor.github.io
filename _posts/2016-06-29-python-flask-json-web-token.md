@@ -195,7 +195,13 @@ token在生成之后，是靠expire使其过期失效的。签发之后的token�
 
 * 问题2.token自动延期
 
-解决有效期问题，很自然能想到的是把每个token存库，设置一个valid字段，一旦注销了就valid=0；设置有效期字段，想要延期就增加有效期时间。openstack keystone就是这么做的。这个做法虽方便，但对数据库的压力较大，甚至在访问量较大，签发token较多的情况下，是对数据库的一个挑战。
+如何解决token过期的问题，网上看到很多讨论。无非集中在这几个点上：
+
+1. JWT是一次性认证完毕加载信息到token里的，token的信息内含过期信息。过期时间过长则被重放攻击的风险太大，而过期时间太短则请求端体验太差（动不动就要重新登录）
+
+2. 把token存进库里，很自然能想到的是把每个token存库，设置一个valid字段，一旦注销了就valid=0；设置有效期字段，想要延期就增加有效期时间。openstack keystone就是这么做的。这个做法虽方便，但对数据库的压力较大，甚至在访问量较大，签发token较多的情况下，是对数据库的一个挑战。况且这也有悖于JWT的初衷。
+
+3. 为了使用户不需要经常重新登录，客户端将用户名密码保存起来（cookie），那还得考虑防御CSRF攻击的问题。
 
 在第三方认证协议Oauth2.0（<a href="https://tools.ietf.org/html/rfc6749">RFC6749</a>）则采取了另一种方法：refresh token。在用户首次认证后，签发两个token：
 
@@ -206,6 +212,16 @@ token在生成之后，是靠expire使其过期失效的。签发之后的token�
 由此可以给两类不同token设置不同的有效期，例如给access token仅1小时的有效时间，而refresh token则可以是一个月。api的登出通过access token的过期来实现（前端则可直接抛弃此token实现登出），在refresh token的存续期内，访问api时可执refresh token申请新的access token（前端可存此refresh token，access token过其实进行更新，达到自动延期的效果）。
 
 refresh token不可再延期，过期需重新使用用户名密码登录。
+
+这种方式的理念在于，将证书分为三种级别：
+
+* access token 短期证书，用于最终鉴权
+
+* refresh token 较长期的证书，用于产生短期证书，不可直接用于服务请求
+
+* 用户名密码 几乎永久的证书，用于产生长期证书和短期证书，不可直接用于服务请求
+
+通过这种方式，使证书功效和证书时效结合考虑。
 
 ps.前面提到创建token的时候将expire_in超时时间间隔作为函数的形参，是为了将此函数用于生成access token和refresh token，而两者的expire_in时间是不同的。
 
