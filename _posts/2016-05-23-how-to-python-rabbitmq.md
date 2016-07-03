@@ -3,7 +3,7 @@ layout: post
 title: (1)用rabbitMQ做基于python的消息发送和接收
 description: "怎样用rabbitMQ做消息的发送和接收，本文介绍它的一些简单原理，并介绍简单的实现代码"
 modified: 2016-5-26
-tags: [python, rabbitMQ]
+tags: [python, MQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz

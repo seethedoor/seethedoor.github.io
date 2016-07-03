@@ -3,7 +3,7 @@ layout: post
 title: (2)用rabbitMQ做工作队列的接收端负载均衡
 description: "怎样用rabbitMQ来做python的工作队列，用于解决一些时延性的方法调度问题"
 modified: 2016-6-1
-tags: [python, rabbitMQ]
+tags: [python, MQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz

@@ -3,7 +3,7 @@ layout: post
 title: (3)使用rabbitMQ的消息交换机
 description: "rabbitMQ的消息交换机制"
 modified: 2016-6-2
-tags: [python, rabbitMQ]
+tags: [python, MQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz

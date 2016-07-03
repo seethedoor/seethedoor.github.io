@@ -3,7 +3,7 @@ layout: post
 title: 用restful来设计API
 description: 
 modified: 2016-6-28
-tags: [restful]
+tags: [others]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
