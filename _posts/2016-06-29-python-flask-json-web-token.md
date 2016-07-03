@@ -3,7 +3,7 @@ layout: post
 title: 使用python实现后台系统的JWT认证
 description: 
 modified: 2016-6-29
-tags: [JWT python flask]
+tags: [JWT, python, flask]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz

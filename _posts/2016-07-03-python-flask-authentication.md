@@ -3,7 +3,7 @@ layout: post
 title: 使用python/flask实现认证、鉴权
 description: 
 modified: 2016-6-29
-tags: [JWT python flask]
+tags: [JWT, python, flask]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
