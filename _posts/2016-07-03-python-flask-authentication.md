@@ -41,7 +41,7 @@ image:
 # 怎么实现
 
 这需要一个带参数的decorator类，需要传参。内部逻辑十分简单，检查token--检查用户--检查角色--检查权限匹配--搞定放行。
-
+ps.抱歉我的英文十分chinglish哈哈。。
 auth.py
 {% highlight python %}
 class PrivilegeAuth(Resource):
