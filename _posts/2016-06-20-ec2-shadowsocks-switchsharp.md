@@ -3,7 +3,7 @@ layout: post
 title: 在AWS-EC2搭建shadowsocks前向代理
 description: 在AWS-EC2搭建shadowsocks前向代理，顺便用switchsharp做访问规则切换
 modified: 2016-6-20
-tags: [forward proxy]
+tags: [others]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
