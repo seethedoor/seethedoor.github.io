@@ -3,7 +3,7 @@ layout: post
 title: 使用zabbix监控openstack RPC服务的一种方法
 description: "也可作为一个zabbix外部监控脚本优化的实例"
 modified: 2016-6-1
-tags: [python, zabbix, rabbitMQ]
+tags: [python, zabbix, MQ]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
