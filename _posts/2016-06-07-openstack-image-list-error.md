@@ -3,7 +3,7 @@ layout: post
 title: openstack的nova image-list错误
 description: "解决一个nova image-list的错误"
 modified: 2016-6-2
-tags: [openstack, nova, glance]
+tags: [openstack]
 image:
   feature: abstract-3.jpg
   credit: dargadgetz
