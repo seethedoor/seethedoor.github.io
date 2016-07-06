@@ -198,7 +198,7 @@ class AnsibleTask(object):
             )
         play = Play().load(play_source, variable_manager=self.variable_manager, loader=self.loader)
 
-    	# actually run it
+    	# run it
         tqm = None
         try:
             tqm = TaskQueueManager(
