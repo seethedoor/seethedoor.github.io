@@ -164,9 +164,9 @@ class AnsibleTask(object):
                           ]
                        )
 
-# initialize needed objects
+        # initialize needed objects
         self.variable_manager = VariableManager()
-    #loader = DataLoader()
+
         self.options = Options(
                           listtags=False, listtasks=False, listhosts=False, syntax=False, connection='smart',
                           module_path='/usr/lib/python2.7/site-packages/ansible/modules', forks=100,
@@ -177,20 +177,15 @@ class AnsibleTask(object):
         self.passwords = dict(vault_pass='secret')
         self.loader = DataLoader()
 
-# create inventory and pass to var manager
+		# create inventory and pass to var manager
         self.hostsFile = NamedTemporaryFile(delete=False)
         self.hostsFile.write(targetHost)
         self.hostsFile.close()
         self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=self.hostsFile.name)
-        #if targetHost=='1':
-        #    self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list='/tmp/host.test1')
-        #elif targetHost=='2':        
-        #    self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list='/tmp/host.test2')
-        #inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=hostsFile.name)
         self.variable_manager.set_inventory(self.inventory)
 
     def ansiblePlay(self, action):
-# create play with tasks
+        # create play with tasks
         args = "ls /"
         play_source =  dict(
                 name = "Ansible Play",
@@ -205,7 +200,7 @@ class AnsibleTask(object):
             )
         play = Play().load(play_source, variable_manager=self.variable_manager, loader=self.loader)
 
-# actually run it
+    	# actually run it
         tqm = None
         try:
             tqm = TaskQueueManager(
@@ -218,7 +213,7 @@ class AnsibleTask(object):
                   )
             result = tqm.run(play)
         finally:
-        #    print result
+        # print result
             if tqm is not None:
                 tqm.cleanup()
                 os.remove(self.hostsFile.name)
