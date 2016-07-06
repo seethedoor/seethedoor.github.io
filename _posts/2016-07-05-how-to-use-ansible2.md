@@ -192,8 +192,6 @@ class AnsibleTask(object):
                 hosts = 'all',
                 gather_facts = 'no',
                 tasks = [
-            #dict(action=dict(module='command', args='pwd'), register='shell_out'),
-            #dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}')))
                     dict(action=dict(module='shell', args=args), register='shell_out'),
                     dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}')))
                 ]
