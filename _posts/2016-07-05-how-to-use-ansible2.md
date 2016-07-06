@@ -91,15 +91,17 @@ class TaskQueueManager:
 # ansible.playbook.play
 
 ansible.playbook是一个原生模块，既用于CLI也用于API。这里可以看出来：
+
 {% highlight python %}
 try:
     from __main__ import display
 except ImportError:
     from ansible.utils.display import Display
     display = Display()
-{% endhight %}
+{% endhighlight %}
 
 ansible.playbook.play（ansible/playbook/play.py）。初始化如下：
+
 {% highlight python %}
 __all__ = ['Play']
 
@@ -118,6 +120,7 @@ class Play(Base, Taggable, Become):
 {% endhighlight %}
 
 * 最后，用task_queue_manager(play)来执行。
+
 {% highlight python %}
 def run(self, play):
         '''
@@ -127,7 +130,6 @@ def run(self, play):
         a given task (meaning no hosts move on to the next task until all hosts
         are done with the current task).
         '''
-
 {% endhighlight %}
 
 # 一个完整的流程
